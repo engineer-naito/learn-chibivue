@@ -42,7 +42,8 @@ export function createRenderer(options: RendererOptions) {
   }
 
   const render: RootRenderFunction = (vNode, container) => {
-    hostSetElementText(container, vNode);
+    const el = renderVNode(vNode);
+    hostInsert(el, container);
   }
 
   return { render };
