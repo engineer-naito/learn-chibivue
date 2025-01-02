@@ -1,4 +1,4 @@
-import { VNode } from "./vnode";
+import type { VNode } from "./vnode";
 
 export interface RendererOptions<HostNode = RendererNode> {
   createElement(type: string): HostNode;
