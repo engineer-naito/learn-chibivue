@@ -21,6 +21,8 @@ export function createAppAPI<HostElement>(
           const vNode = componentRender();
           render(vNode, rootContainer);
         };
+
+        updateComponent();
       }
     }
 
