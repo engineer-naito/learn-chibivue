@@ -22,7 +22,7 @@ export interface RendererNode {
 export interface RendererElement extends RendererNode {}
 
 export type RootRenderFunction<HostElement = RendererElement> = (
-  message: string,
+  vNode: VNode,
   containter: HostElement,
 ) => void;
 
