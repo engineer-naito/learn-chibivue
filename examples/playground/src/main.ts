@@ -11,7 +11,7 @@ const app = createApp({
             alert("Hello World!");
           },
         },
-        ["click me!"],
+        ["Click me!"],
       ),
     ]);
   },
