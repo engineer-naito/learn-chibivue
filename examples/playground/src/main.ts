@@ -1,19 +1,24 @@
 import { createApp, h } from "chibivue";
 
 const app = createApp({
-  render() {
-    return h("div", {}, [
-      h("p", { style: "color: red; font-weight: bold;" }, ["Hello World!"]),
-      h(
-        "button",
-        {
-          onClick() {
-            alert("Hello World!");
+  setup() {
+    // TODO: define state
+    // const state = reactive({ count: 0 });
+
+    return function render() {
+      return h("div", { id: "my-app" }, [
+        h("p", { style: "color: red; font-weight: bold;" }, ["Hello World!"]),
+        h(
+          "button",
+          {
+            onClick() {
+              alert("Hello World!");
+            },
           },
-        },
-        ["Click me!"],
-      ),
-    ]);
+          ["Click me!"],
+        ),
+      ]);
+    }
   },
 });
 
