@@ -1,6 +1,11 @@
 import { VNode } from "./vNode"
 
-export interface RendererOptions<HostNode = RendererNode> {
+export interface RendererOptions<
+  HostNode = RendererNode,
+  HostElement = RendererElement
+> {
+  patchProp(el: HostElement, key: string, value: any): void,
+
   createElement(type: string): HostNode
 
   createText(type: string): HostNode
@@ -22,7 +27,8 @@ export type RootRenderFunction<HostElement = RendererElement> = (
 ) => void
 
 export function createRenderer(options: RendererOptions) {
-  const { 
+  const {
+    patchProp: hostPatchProp,
     createElement: hostCreateElement,
     createText: hostCreateText,
     insert: hostInsert,
@@ -31,6 +37,10 @@ export function createRenderer(options: RendererOptions) {
   function renderVNode(vNode: VNode | string) {
     if (typeof vNode === "string") return hostCreateText(vNode)
       const el = hostCreateElement(vNode.type)
+
+    Object.entries(vNode.props).forEach(([key, value]) => {
+      hostPatchProp(el, key, value);
+    });
 
     for (const child of vNode.children) {
       const childEl = renderVNode(child)
