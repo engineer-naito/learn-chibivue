@@ -1,2 +1,5 @@
-export * from "./renderer"
-export * from "./apiCreateApp"
+export type { App, CreateAppFunction } from "./apiCreateApp"
+export { createAppAPI } from "./apiCreateApp"
+
+export type { RendererOptions } from "./renderer"
+export { createRenderer } from "./renderer"
