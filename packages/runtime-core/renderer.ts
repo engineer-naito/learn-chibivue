@@ -1,4 +1,4 @@
-import { VNode } from "./vNode"
+import type { VNode } from "./vNode"
 
 export interface RendererOptions<
   HostNode = RendererNode,
@@ -51,6 +51,7 @@ export function createRenderer(options: RendererOptions) {
   }
 
   const render: RootRenderFunction = (vNode, container) => {
+    while (container.firstChild) container.removeChild(container.firstChild)
     const el = renderVNode(vNode)
     hostInsert(el, container)
   }
