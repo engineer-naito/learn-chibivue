@@ -1,3 +1,4 @@
+import { ReactiveEffect } from "../reactivity"
 import type { Component } from "./component"
 import type { RootRenderFunction } from "./renderer"
 
@@ -20,7 +21,9 @@ export function createAppAPI<HostElement>(
           const vNode = componentRender()
           render(vNode, rootContainer)
         }
-        updateComponent()
+        
+        const effect = new ReactiveEffect(updateComponent)
+        effect.run()
       },
     }
     return app
