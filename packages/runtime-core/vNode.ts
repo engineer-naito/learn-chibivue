@@ -6,6 +6,7 @@ export interface VNode<HostNode = any> {
   type: VNodeTypes
   props: VNodeProps | null,
   children: VNodeNormalizedChildren
+  el: HostNode | undefined
 }
 
 export interface VNodeProps {
