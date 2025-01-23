@@ -1,4 +1,3 @@
-import { ReactiveEffect } from "../reactivity"
 import type { Component } from "./component"
 import type { RootRenderFunction } from "./renderer"
 
@@ -19,6 +18,7 @@ export function createAppAPI<HostElement>(
         render(rootComponent, rootContainer)
       },
     }
+
     return app
   }
 }

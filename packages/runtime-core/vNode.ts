@@ -26,7 +26,7 @@ export function createVNode(
   props: VNodeProps | null,
   children: VNodeNormalizedChildren,
 ): VNode {
-  const vNode: VNode = { type, props, children }
+  const vNode: VNode = { type, props, children, el: undefined }
   return vNode
 }
 

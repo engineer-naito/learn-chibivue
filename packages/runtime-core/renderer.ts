@@ -1,5 +1,5 @@
 import { ReactiveEffect } from "../reactivity"
-import { Component } from "./component"
+import type { Component } from "./component"
 import { normalizeVNode, Text } from "./vNode"
 import type { VNode } from "./vNode"
 
@@ -11,7 +11,9 @@ export interface RendererOptions<
 
   createElement(type: string): HostNode
 
-  createText(type: string): HostNode
+  createText(text: string): HostNode
+
+  setText(node: HostNode, text: string): void
 
   setElementText(node: HostNode, text: string): void
 
@@ -25,7 +27,7 @@ export interface RendererNode {
 export interface RendererElement extends RendererNode {}
 
 export type RootRenderFunction<HostElement = RendererElement> = (
-  rootComponent: Component,
+  vNode: Component,
   container: HostElement,
 ) => void
 
@@ -34,6 +36,7 @@ export function createRenderer(options: RendererOptions) {
     patchProp: hostPatchProp,
     createElement: hostCreateElement,
     createText: hostCreateText,
+    setText: hostSetText,
     insert: hostInsert,
   } = options
 
@@ -54,7 +57,7 @@ export function createRenderer(options: RendererOptions) {
     if (n1 === null) {
       mountElemtnt(n2, container)
     } else {
-      // patchElement(n1, n2)
+      patchElement(n1, n2)
     }
   }
 
@@ -63,7 +66,7 @@ export function createRenderer(options: RendererOptions) {
     const { type, props } = vNode
     el = vNode.el = hostCreateElement(type as string)
 
-    mountChildren(vNode.children as VNode[], el) // TODO
+    mountChildren(vNode.children as VNode[], el)
 
     if (props) {
       for (const key in props) {
@@ -75,9 +78,9 @@ export function createRenderer(options: RendererOptions) {
   }
 
   const mountChildren = (children: VNode[], container: RendererElement) => {
-    for (let child of children) {
-      const _child = (child = normalizeVNode(child))
-      patch(null, _child, container)
+    for (let i = 0; i < children.length; i++) {
+      const child = (children[i] = normalizeVNode(children[i]))
+      patch(null, child, container)
     }
   }
 
@@ -89,7 +92,34 @@ export function createRenderer(options: RendererOptions) {
     if (n1 === null) {
       hostInsert((n2.el = hostCreateText(n2.children as string)), container)
     } else {
-      // TODO: patch
+      const el = (n2.el = n1.el!)
+      if (n2.children !== n1.children) {
+        hostSetText(el, n2.children as string)
+      }
+    }
+  }
+
+  const patchElement = (n1: VNode, n2: VNode) => {
+    const el = (n2.el = n1.el!)
+
+    const props = n2.props
+
+    patchChildren(n1, n2, el)
+
+    for (const key in props) {
+      if (props[key] !== n1.props?.[key]) {
+        hostPatchProp(el, key, props[key])
+      }
+    }
+  }
+
+  const patchChildren = (n1: VNode, n2: VNode, container: RendererElement) => {
+    const c1 = n1.children as VNode[]
+    const c2 = n2.children as VNode[]
+
+    for (let i = 0; i < c2.length; i++) {
+      const child = (c2[i] = normalizeVNode(c2[i]))
+      patch(c1[i], child, container)
     }
   }
 
