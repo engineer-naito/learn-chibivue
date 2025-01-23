@@ -4,7 +4,7 @@ export const Text = Symbol()
 
 export type VNodeTypes = string | typeof Text
 
-export type VNode<HostNode = RendererNode> = {
+export interface VNode<HostNode = any> {
   type: VNodeTypes
   props: VNodeProps | null
   children: VNodeNormalizedChildren
