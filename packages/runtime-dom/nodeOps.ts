@@ -5,7 +5,7 @@ export const nodeOps: Omit<RendererOptions<Node>, "patchProp"> = {
     return document.createElement(tagName)
   },
 
-  createText: (text: string) => {
+  createText: text => {
     return document.createTextNode(text)
   },
 
@@ -19,5 +19,9 @@ export const nodeOps: Omit<RendererOptions<Node>, "patchProp"> = {
 
   insert: (child, parent, anchor) => {
     parent.insertBefore(child, anchor || null)
+  },
+
+  parentNode: node => {
+    return node.parentNode
   },
 }

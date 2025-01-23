@@ -1,7 +1,7 @@
 import { ReactiveEffect } from "../reactivity"
 import type { Component, ComponentInternalInstance, InternalRenderFunction } from "./component"
 import { createComponentInstance,} from "./component"
-import { normalizeVNode, Text } from "./vNode"
+import { createVNode, normalizeVNode, Text } from "./vNode"
 import type { VNode } from "./vNode"
 
 export interface RendererOptions<
@@ -19,6 +19,8 @@ export interface RendererOptions<
   setElementText(node: HostNode, text: string): void
 
   insert(child: HostNode, parent: HostNode, anchor?: HostNode | null): void
+
+  parentNode(node: HostNode): HostNode | null
 }
 
 export interface RendererNode {
@@ -39,6 +41,7 @@ export function createRenderer(options: RendererOptions) {
     createText: hostCreateText,
     setText: hostSetText,
     insert: hostInsert,
+    parentNode: hostParentNode,
   } = options
 
   const patch = (n1: VNode | null, n2: VNode, container: RendererElement) => {
@@ -76,7 +79,45 @@ export function createRenderer(options: RendererOptions) {
       instance.render = component.setup() as InternalRenderFunction
     }
 
-    // TODO: setup effect
+    setupRenderEffect(instance, initialVNode, container)
+  }
+
+  const setupRenderEffect = (
+    instance: ComponentInternalInstance,
+    initialVNode: VNode,
+    container: RendererElement,
+  ) => {
+    const componentUpdateFn = () => {
+      const { render } = instance
+      
+      if (!instance.isMounted) {
+        const subTree = (instance.subTree = normalizeVNode(render()))
+        patch(null, subTree, container)
+        initialVNode.el = subTree.el
+        instance.isMounted = true
+      } else {
+        let { next, vNode } = instance
+
+        if (next) {
+          next.el = vNode.el
+          next.component = instance
+          instance.vNode = next
+          instance.next = null
+        } else {
+          next = vNode
+        }
+
+        const prevTree = instance.subTree
+        const nextTree = normalizeVNode(render())
+        instance.subTree = nextTree
+
+        patch(prevTree, nextTree, hostParentNode(prevTree.el!)!)
+      }
+    }
+
+    const effect = (instance.effect = new ReactiveEffect(componentUpdateFn))
+    const update = (instance.update = () => effect.run())
+    update()
   }
 
   const patchComponent = (n1: VNode, n2: VNode) => {
@@ -157,19 +198,15 @@ export function createRenderer(options: RendererOptions) {
     }
   }
 
+  const updateComponent = (n1: VNode, n2: VNode) => {
+    const instance = (n2.component = n1.component)!
+    instance.next = n2
+    instance.update()
+  }
+
   const render: RootRenderFunction = (rootComponent, container) => {
-    const componentRender = rootComponent.setup!()
-
-    let n1: VNode | null = null
-
-    const updateComponent = () => {
-      const n2 = componentRender()
-      patch(n1, n2, container)
-      n1 = n2
-    }
-
-    const effect = new ReactiveEffect(updateComponent)
-    effect.run()
+    const vNode = createVNode(rootComponent, {}, [])
+    patch(null, vNode, container)
   }
 
   return { render }
