@@ -1,5 +1,6 @@
 import { ReactiveEffect } from "../reactivity"
-import { createComponentInstance, type Component, type ComponentInternalInstance } from "./component"
+import type { Component, ComponentInternalInstance, InternalRenderFunction } from "./component"
+import { createComponentInstance,} from "./component"
 import { normalizeVNode, Text } from "./vNode"
 import type { VNode } from "./vNode"
 
@@ -69,7 +70,12 @@ export function createRenderer(options: RendererOptions) {
     const instance: ComponentInternalInstance = (
       initialVNode.component = createComponentInstance(initialVNode)
     )
-    // TODO: setup component
+
+    const component =initialVNode.type as Component
+    if (component.setup) {
+      instance.render = component.setup() as InternalRenderFunction
+    }
+
     // TODO: setup effect
   }
 
