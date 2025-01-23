@@ -1,12 +1,15 @@
+import type { ComponentInternalInstance } from "./component"
+
 export const Text = Symbol()
 
-export type VNodeTypes = string | typeof Text
+export type VNodeTypes = string | typeof Text | object
 
 export interface VNode<HostNode = any> {
   type: VNodeTypes
   props: VNodeProps | null
   children: VNodeNormalizedChildren
   el: HostNode | undefined
+  component: ComponentInternalInstance | null
 }
 
 export interface VNodeProps {
