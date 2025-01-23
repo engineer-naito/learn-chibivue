@@ -1,5 +1,3 @@
-import { RendererNode } from "./renderer"
-
 export const Text = Symbol()
 
 export type VNodeTypes = string | typeof Text
