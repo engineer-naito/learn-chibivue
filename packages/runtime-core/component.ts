@@ -8,7 +8,7 @@ export interface ComponentInternalInstance {
   type: Component
   vNode: VNode
   subTree: VNode
-  next: VNode
+  next: VNode | null
   effect: ReactiveEffect
   render: InternalRenderFunction
   update: () => void
@@ -17,4 +17,21 @@ export interface ComponentInternalInstance {
 
 export type InternalRenderFunction = {
   (): VNodeChild
+}
+
+export function createComponentInstance(vNode: VNode): ComponentInternalInstance {
+  const type = vNode.type as Component
+
+  const instance: ComponentInternalInstance = {
+    type,
+    vNode,
+    next: null,
+    effect: null!,
+    subTree: null!,
+    update: null!,
+    render: null!,
+    isMounted: false,
+  }
+
+  return instance
 }

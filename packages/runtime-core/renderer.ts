@@ -1,5 +1,5 @@
 import { ReactiveEffect } from "../reactivity"
-import type { Component } from "./component"
+import { createComponentInstance, type Component, type ComponentInternalInstance } from "./component"
 import { normalizeVNode, Text } from "./vNode"
 import type { VNode } from "./vNode"
 
@@ -66,7 +66,11 @@ export function createRenderer(options: RendererOptions) {
   }
 
   const mountComponent = (initialVNode: VNode, container: RendererElement) => {
-    // TODO
+    const instance: ComponentInternalInstance = (
+      initialVNode.component = createComponentInstance(initialVNode)
+    )
+    // TODO: setup component
+    // TODO: setup effect
   }
 
   const patchComponent = (n1: VNode, n2: VNode) => {
