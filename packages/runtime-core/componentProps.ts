@@ -1,5 +1,6 @@
 import { reactive } from "../reactivity"
 import type { ComponentInternalInstance, Data } from "./component"
+import { createComponentInstance } from "./component"
 
 export type Props = Record<string, PropOptions | null>
 
@@ -35,4 +36,12 @@ function setFullProps(
       }
     }
   }
+}
+
+export function updateProps(
+  instance: ComponentInternalInstance,
+  rawProps: Data | null,
+) {
+  const { props } = instance
+  Object.assign(props, rawProps)
 }

@@ -1,7 +1,7 @@
 import { ReactiveEffect } from "../reactivity"
 import type { Component, ComponentInternalInstance, InternalRenderFunction } from "./component"
 import { createComponentInstance,} from "./component"
-import { initProps } from "./componentProps"
+import { initProps, updateProps } from "./componentProps"
 import { createVNode, normalizeVNode, Text } from "./vNode"
 import type { VNode } from "./vNode"
 
@@ -66,7 +66,7 @@ export function createRenderer(options: RendererOptions) {
     if (n1 === null) {
       mountComponent(n2, container)
     } else {
-      patchComponent(n1, n2)
+      updateComponent(n1, n2)
     }
   }
 
@@ -107,6 +107,7 @@ export function createRenderer(options: RendererOptions) {
           next.component = instance
           instance.vNode = next
           instance.next = null
+          updateProps(instance, next.props)
         } else {
           next = vNode
         }
@@ -122,10 +123,6 @@ export function createRenderer(options: RendererOptions) {
     const effect = (instance.effect = new ReactiveEffect(componentUpdateFn))
     const update = (instance.update = () => effect.run())
     update()
-  }
-
-  const patchComponent = (n1: VNode, n2: VNode) => {
-    // TODO
   }
 
   const processElement = (
