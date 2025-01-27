@@ -17,7 +17,7 @@ export interface ElementNode extends Node {
   isSelfClosing: boolean
 }
 
-export interface AttributeNode {
+export interface AttributeNode extends Node {
   type: NodeTypes.ATTRIBUTE
   name: string
   value: TextNode | undefined
