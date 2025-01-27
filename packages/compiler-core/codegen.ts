@@ -29,7 +29,11 @@ const genNode = (node: TemplateChildNode): string => {
 
 const genElement = (el: ElementNode): string => {
   return `h("${el.tag}", {${el.props
-    .map(({ name, value }) => `${name}: "${value?.content}"`)
+    .map(({ name, value }) => 
+      name === "@click"
+        ? `onClick: ${value?.content}`
+        : `${name}: "${value?.content}"`
+      )
     .join(", ")}}, [${el.children.map(it => genNode(it)).join(", ")}])`
 }
 

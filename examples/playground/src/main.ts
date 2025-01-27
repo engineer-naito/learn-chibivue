@@ -20,7 +20,7 @@ const app = createApp({
       />
       <p><b>chibivue</b> is the minimal Vue.js</p>
 
-      <button>Click me!</button>
+      <button @click="changeMessage">Click me!</button>
 
       <style>
         .container {
