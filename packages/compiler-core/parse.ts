@@ -1,4 +1,11 @@
-import type { AttributeNode, ElementNode, Position, SourceLocation, TemplateChildNode, TextNode } from "./ast"
+import type {
+  AttributeNode,
+  ElementNode,
+  Position,
+  SourceLocation,
+  TemplateChildNode,
+  TextNode
+} from "./ast"
 import { NodeTypes } from "./ast" 
 
 export interface ParserContext {
@@ -27,8 +34,7 @@ export const baseParse = (
   const context = createParserContext(content)
   const children = parseChildren(context, [])
 
-  // TODO
-  return { children: [] }
+  return { children }
 }
 
 function parseChildren(
@@ -94,10 +100,11 @@ function last<T>(xs: T[]): T | undefined {
 }
 
 function startsWithEndTagOpen(source: string, tag: string): boolean {
-  return ( 
+  const tagDelimiterPattern: RegExp = /[\t\r\n\f />]/
+  return (
     starsWith(source, "</") &&
     source.slice(2, 2 + tag.length).toLowerCase() === tag.toLowerCase() &&
-    /[\t\r\n\f />]/.test(source[2 + tag.length] || '>')
+    tagDelimiterPattern.test(source[2 + tag.length] || ">")
   )
 }
 
@@ -133,7 +140,8 @@ function advanceBy(context: ParserContext, numberOfCharacters: number): void {
 }
 
 function advanceSpaces(context: ParserContext): void {
-  const match = /^[\t\r\n\f ]+/.exec(context.source)
+  const leadingWhitespacePattern: RegExp = /^[\t\r\n\f ]+/
+  const match = leadingWhitespacePattern.exec(context.source)
   if (match) {
     advanceBy(context, match[0].length)
   }
@@ -164,7 +172,6 @@ function advancePositionWithMutation(
   return pos
 }
 
-
 function getCursor(context: ParserContext): Position {
   const { column, line, offset } = context
   return { column, line, offset }
@@ -194,13 +201,13 @@ function parseElement(
 ): ElementNode | undefined {
   const element = parseTag(context, TagType.Start)
 
-  if (element.isSelfClosing) {
-    return element
-  }
+  if (element.isSelfClosing) return element
 
   ancestors.push(element)
   const children = parseChildren(context, ancestors)
   ancestors.pop()
+
+  element.children = children
 
   if (startsWithEndTagOpen(context.source, element.tag)) {
     parseTag(context, TagType.End)
@@ -249,9 +256,7 @@ function parseAttributes(
   ) {
     const attr = parseAttribute(context, attributeNames)
 
-    if (type === TagType.Start) {
-      props.push(attr)
-    }
+    if (type === TagType.Start) props.push(attr)
 
     advanceSpaces(context)
   }
@@ -282,7 +287,7 @@ function parseAttribute(
   let value: AttributeValue = undefined
 
   const whitespaceEqualsPattern: RegExp = /^[\t\r\n\f ]*=/
-  if (whitespaceEqualsPattern.exec(context.source)) {
+  if (whitespaceEqualsPattern.test(context.source)) {
     advanceSpaces(context)
     advanceBy(context, 1)
     advanceSpaces(context)
