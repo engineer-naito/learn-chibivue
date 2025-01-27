@@ -73,8 +73,6 @@ export function createRenderer(options: RendererOptions) {
   const mountComponent = (initialVNode: VNode, container: RendererElement) => {
     const instance: ComponentInternalInstance = (initialVNode.component = createComponentInstance(initialVNode))
 
-    console.log(instance)
-
     setupComponent(instance)
     setupRenderEffect(instance, initialVNode, container)
   }
