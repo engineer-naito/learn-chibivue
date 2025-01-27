@@ -6,6 +6,8 @@ const app = createApp({
     const changeMessage = () => {
       state.message += "!"
     }
+
+    return { state, changeMessage} 
   },
 
   template: `
