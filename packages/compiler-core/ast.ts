@@ -4,6 +4,11 @@ export const enum NodeTypes {
   ATTRIBUTE,
 }
 
+export interface Node {
+  type: NodeTypes
+  loc: SourceLocation
+}
+
 export interface ElementNode extends Node {
   type: NodeTypes.ELEMENT
   tag: string
