@@ -1,5 +1,5 @@
 import { ReactiveEffect } from "../reactivity"
-import type { Component, ComponentInternalInstance, InternalRenderFunction } from "./component"
+import type { Component, ComponentInternalInstance } from "./component"
 import { createComponentInstance, setupComponent,} from "./component"
 import { updateProps } from "./componentProps"
 import { createVNode, normalizeVNode, Text } from "./vNode"
