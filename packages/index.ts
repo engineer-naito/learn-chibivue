@@ -3,8 +3,8 @@ export * from "./runtime-dom"
 export * from "./reactivity"
 
 import { compile } from "./compiler-dom"
-import type { InternalRenderFunction } from "./runtime-core/component"
-import { registerRuntimeCompiler } from "./runtime-core/component"
+import type { InternalRenderFunction } from "./runtime-core"
+import { registerRuntimeCompiler } from "./runtime-core"
 import * as runtimeDom from "./runtime-dom"
 
 function compileToFunction(template: string): InternalRenderFunction {
