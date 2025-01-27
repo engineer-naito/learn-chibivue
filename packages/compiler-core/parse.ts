@@ -39,10 +39,6 @@ export const baseParse = (
 
 function parseChildren(
   context: ParserContext,
-
-  // HTML は再起的な構造を持っている
-  // 祖先要素をスタックとして持っておいて、子にネストして行くたびに push
-  // end タグを見つけると parseChildren が終了して ancestors を pop 
   ancestors: ElementNode[],
 ): TemplateChildNode[] {
   const nodes: TemplateChildNode[] = []
@@ -51,6 +47,7 @@ function parseChildren(
     const s = context.source
     let node: TemplateChildNode | undefined = undefined
 
+    if (startsWith)
     if (s[0] === "<") {
       if (/[a-z]/i.test(s[1])) {
         node = parseElement(context, ancestors)
@@ -70,7 +67,7 @@ function parseChildren(
 function isEnd(context: ParserContext, ancestors: ElementNode[]): boolean {
   const s = context.source
 
-  if (starsWith(s, "</")) {
+  if (startsWith(s, "</")) {
     for (let i = ancestors.length - 1; i >= 0; --i) {
       if (startsWithEndTagOpen(s, ancestors[i].tag)) return true
     }
@@ -79,7 +76,7 @@ function isEnd(context: ParserContext, ancestors: ElementNode[]): boolean {
   return !s
 }
 
-function starsWith(source: string, searchString: string): boolean {
+function startsWith(source: string, searchString: string): boolean {
   return source.startsWith(searchString)
 }
 
@@ -102,7 +99,7 @@ function last<T>(xs: T[]): T | undefined {
 function startsWithEndTagOpen(source: string, tag: string): boolean {
   const tagDelimiterPattern: RegExp = /[\t\r\n\f />]/
   return (
-    starsWith(source, "</") &&
+    startsWith(source, "</") &&
     source.slice(2, 2 + tag.length).toLowerCase() === tag.toLowerCase() &&
     tagDelimiterPattern.test(source[2 + tag.length] || ">")
   )
@@ -229,7 +226,7 @@ function parseTag(context: ParserContext, type: TagType): ElementNode {
 
   let isSelfClosing = false
 
-  isSelfClosing = starsWith(context.source, "/>")
+  isSelfClosing = startsWith(context.source, "/>")
   advanceBy(context, isSelfClosing ? 2 : 1)
 
   return {
@@ -251,8 +248,8 @@ function parseAttributes(
 
   while (
     context.source.length > 0 &&
-    !starsWith(context.source, ">") &&
-    !starsWith(context.source, "/>")
+    !startsWith(context.source, ">") &&
+    !startsWith(context.source, "/>")
   ) {
     const attr = parseAttribute(context, attributeNames)
 
