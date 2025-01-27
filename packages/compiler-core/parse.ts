@@ -1,6 +1,7 @@
 import type {
   AttributeNode,
   ElementNode,
+  InterpolationNode,
   Position,
   SourceLocation,
   TemplateChildNode,
@@ -47,8 +48,9 @@ function parseChildren(
     const s = context.source
     let node: TemplateChildNode | undefined = undefined
 
-    if (startsWith)
-    if (s[0] === "<") {
+    if (startsWith(s, "{{")) {
+      node = parseInterpolation(context)
+    } else if (s[0] === "<") {
       if (/[a-z]/i.test(s[1])) {
         node = parseElement(context, ancestors)
       }
@@ -62,6 +64,41 @@ function parseChildren(
   }
 
   return nodes
+}
+
+function parseInterpolation(
+  context: ParserContext,
+): InterpolationNode | undefined {
+  const [ open, close ] = ["{{", "}}"]
+  const closeIndex = context.source.indexOf(close, open.length)
+  if (closeIndex === -1) return undefined
+
+  const start = getCursor(context)
+  advanceBy(context, open.length)
+
+  const innerStart = getCursor(context)
+  const innerEnd = getCursor(context)
+  const rawContentLength = closeIndex - open.length
+  const rawContent = context.source.slice(0, rawContentLength)
+  const preTrimContent = parseTextData(context, rawContentLength)
+
+  const content = preTrimContent.trim()
+
+  const startOffset = preTrimContent.indexOf(content)
+
+  if (startOffset > 0) {
+    advancePositionWithMutation(innerStart, rawContent, startOffset)
+  }
+
+  const endOffset = rawContentLength - (preTrimContent.length - content.length - startOffset)
+  advancePositionWithMutation(innerEnd, rawContent, endOffset)
+  advanceBy(context, close.length)
+
+  return {
+    type: NodeTypes.INTERPOLATION,
+    content,
+    loc: getSelection(context, start)
+  }
 }
 
 function isEnd(context: ParserContext, ancestors: ElementNode[]): boolean {
@@ -106,11 +143,13 @@ function startsWithEndTagOpen(source: string, tag: string): boolean {
 }
 
 function parseText(context: ParserContext): TextNode {
-  const endToken = "<"
+  const endTokens = ["<", "{{"]
   let endIndex = context.source.length
-  const index = context.source.indexOf(endToken, 1)
-  if (index !== -1 && endIndex > index) {
-    endIndex = index
+  for (let i = 0; i < endTokens.length; i++) {
+    const index = context.source.indexOf(endTokens[i], 1)
+    if (index !== -1 && endIndex > index) {
+      endIndex = index
+    }
   }
 
   const start = getCursor(context)
