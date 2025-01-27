@@ -11,7 +11,7 @@ export const createApp = ((...args) => {
   const { mount } = app
   app.mount = (selector: string) =>{
     const container = document.querySelector(selector)
-    if (!container) return 
+    if (!container) return
     mount(container)
   }
 
