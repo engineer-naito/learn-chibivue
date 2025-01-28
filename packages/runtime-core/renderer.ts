@@ -84,7 +84,7 @@ export function createRenderer(options: RendererOptions) {
   ) => {
     const componentUpdateFn = () => {
       const { render, setupState } = instance
-      
+
       if (!instance.isMounted) {
         const subTree = (instance.subTree = normalizeVNode(render(setupState)))
         patch(null, subTree, container)
