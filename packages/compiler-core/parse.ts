@@ -1,5 +1,6 @@
 import type {
   AttributeNode,
+  DirectiveNode,
   ElementNode,
   InterpolationNode,
   Position,
@@ -281,7 +282,7 @@ function parseTag(context: ParserContext, type: TagType): ElementNode {
 function parseAttributes(
   context: ParserContext,
   type: TagType,
-): AttributeNode[] {
+): (AttributeNode | DirectiveNode)[] {
   const props = []
   const attributeNames = new Set<string>()
 
@@ -310,7 +311,7 @@ type AttributeValue =
 function parseAttribute(
   context: ParserContext,
   nameSet: Set<string>,
-): AttributeNode {
+): AttributeNode | DirectiveNode {
   const start = getCursor(context)
   const htmlAttributeNamePattern: RegExp = /^[^\t\r\n\f />][^\t\r\n\f />=]*/
   const match = htmlAttributeNamePattern.exec(context.source)!
@@ -331,6 +332,24 @@ function parseAttribute(
   }
 
   const loc = getSelection(context, start)
+
+  const vueDirectivePattern: RegExp = /^(v-[A-Za-z0-9-]|@)/
+  const vueBindingPattern: RegExp = /(?:^v-([a-z0-9-]+))?(?:(?::|^\.|^@|^#)(\[[^\]]+\]|[^\.]+))?(.+)?$/i
+  if (vueDirectivePattern.test(name)) {
+    const match = vueBindingPattern.exec(name)!
+
+    let dirName = match[1] || (startsWith(name, "@") ? "on": "")
+    let arg = ""
+    if (match[2]) arg = match[2]
+
+    return {
+      type: NodeTypes.DIRECTIVE,
+      name: dirName,
+      exp: value?.content ?? "",
+      loc,
+      arg,
+    }
+  }
 
   return {
     type: NodeTypes.ATTRIBUTE,

@@ -2,12 +2,16 @@ import { createApp, reactive } from "chibivue"
 
 const app = createApp({
   setup() {
-    const state = reactive({ message: "Hello chibivue!" })
+    const state = reactive({ message: "Hello chibivue!", input: "" })
     const changeMessage = () => {
       state.message += "!"
     }
 
-    return { state, changeMessage} 
+    const handleInput = (e: InputEvent) => {
+      state.input = (e.target as HTMLInputElement)?.value ?? ""
+    }
+
+    return { state, changeMessage, handleInput }
   },
 
   template: `
@@ -21,6 +25,15 @@ const app = createApp({
       <p><b>chibivue</b> is the minimal Vue.js</p>
 
       <button @click="changeMessage">Click me!</button>
+
+      <br />
+
+      <label>
+        Input Data
+        <input @input="handleInput" />
+      </label>
+
+      <p>input value: {{ state.input }}</p>
 
       <style>
         .container {

@@ -3,6 +3,7 @@ export const enum NodeTypes {
   TEXT,
   INTERPOLATION,
   ATTRIBUTE,
+  DIRECTIVE,
 }
 
 export interface Node {
@@ -13,7 +14,7 @@ export interface Node {
 export interface ElementNode extends Node {
   type: NodeTypes.ELEMENT
   tag: string
-  props: AttributeNode[]
+  props: (AttributeNode | DirectiveNode)[]
   children: TemplateChildNode[]
   isSelfClosing: boolean
 }
@@ -22,6 +23,15 @@ export interface AttributeNode extends Node {
   type: NodeTypes.ATTRIBUTE
   name: string
   value: TextNode | undefined
+}
+
+// v-name:arg="exp"
+// e.g. v-on:click="increment" -> { name: "on", arg: "click", exp: "increment" }
+export interface DirectiveNode extends Node {
+  type: NodeTypes.DIRECTIVE
+  name: string
+  arg: string
+  exp: string
 }
 
 export type TemplateChildNode = ElementNode | TextNode | InterpolationNode
