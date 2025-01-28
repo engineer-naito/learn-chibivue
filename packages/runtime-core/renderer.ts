@@ -122,13 +122,13 @@ export function createRenderer(options: RendererOptions) {
     container: RendererElement,
   ) => {
     if (n1 === null) {
-      mountElemtnt(n2, container)
+      mountElement(n2, container)
     } else {
       patchElement(n1, n2)
     }
   }
 
-  const mountElemtnt = (vNode: VNode, container: RendererElement) => {
+  const mountElement = (vNode: VNode, container: RendererElement) => {
     let el: RendererElement
     const { type, props } = vNode
     el = vNode.el = hostCreateElement(type as string)
