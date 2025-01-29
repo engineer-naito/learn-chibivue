@@ -84,7 +84,7 @@ export function createRenderer(options: RendererOptions) {
   ) => {
     const componentUpdateFn = () => {
       const { render, setupState } = instance
-
+      
       if (!instance.isMounted) {
         const subTree = (instance.subTree = normalizeVNode(render(setupState)))
         patch(null, subTree, container)
@@ -122,13 +122,13 @@ export function createRenderer(options: RendererOptions) {
     container: RendererElement,
   ) => {
     if (n1 === null) {
-      mountElement(n2, container)
+      mountElemtnt(n2, container)
     } else {
       patchElement(n1, n2)
     }
   }
 
-  const mountElement = (vNode: VNode, container: RendererElement) => {
+  const mountElemtnt = (vNode: VNode, container: RendererElement) => {
     let el: RendererElement
     const { type, props } = vNode
     el = vNode.el = hostCreateElement(type as string)

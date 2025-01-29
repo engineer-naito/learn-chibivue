@@ -1,7 +1,6 @@
-import type { SourceLocation, ElementNode } from "../compiler-core"
-import { NodeTypes } from "../compiler-core"
+import { SourceLocation, ElementNode, NodeTypes } from "../compiler-core"
 import * as CompilerDOM from "../compiler-dom"
-import type { TemplateCompiler } from "./compileTemplate"
+import { TemplateCompiler } from "./compileTemplate"
 
 export interface SFCDescriptor {
   id: string
