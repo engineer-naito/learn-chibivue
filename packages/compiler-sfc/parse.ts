@@ -1,6 +1,7 @@
-import { SourceLocation, ElementNode, NodeTypes } from "../compiler-core"
+import type { SourceLocation, ElementNode } from "../compiler-core"
+import { NodeTypes } from "../compiler-core"
 import * as CompilerDOM from "../compiler-dom"
-import { TemplateCompiler } from "./compileTemplate"
+import type { TemplateCompiler } from "./compileTemplate"
 
 export interface SFCDescriptor {
   id: string
@@ -55,26 +56,27 @@ export function parse(
   }
 
   const ast = compiler.parse(source)
-  ast.children.forEach(node => {
-    if (node.type !== NodeTypes.ELEMENT) return
-    
+  for (const node of ast.children) {
+    if (node.type !== NodeTypes.ELEMENT) continue;
+  
     switch (node.tag) {
       case "template": {
-        descriptor.template = createBlock(node, source) as SFCTemplateBlock
-        break
+        descriptor.template = createBlock(node, source) as SFCTemplateBlock;
+        break;
       }
       case "script": {
-        descriptor.script = createBlock(node, source) as SFCScriptBlock
-        break
+        descriptor.script = createBlock(node, source) as SFCScriptBlock;
+        break;
       }
       case "style": {
-        descriptor.styles.push(createBlock(node, source) as SFCStyleBlock)
-        break
+        descriptor.styles.push(createBlock(node, source) as SFCStyleBlock);
+        break;
       }
       default:
-        break
+        break;
     }
-  })
+  }
+  
 
   return { descriptor }
 }
