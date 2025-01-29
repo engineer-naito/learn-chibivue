@@ -69,7 +69,7 @@ export const setupComponent = (instance: ComponentInternalInstance) => {
   const { props } = instance.vNode
   initProps(instance, props)
 
-  const component =instance.type as Component
+  const component = instance.type as Component
   if (component.setup) {
     const setupResult = component.setup(instance.props, {
       emit: instance.emit,
@@ -89,5 +89,10 @@ export const setupComponent = (instance: ComponentInternalInstance) => {
     if (template) {
       instance.render = compile(template)
     }
+  }
+
+  const { render } = component
+  if (render) {
+    instance.render = render as InternalRenderFunction
   }
 }
