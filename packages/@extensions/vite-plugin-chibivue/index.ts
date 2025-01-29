@@ -14,7 +14,7 @@ export default function vitePluginChibivue(): Plugin {
 
       const outputs = []
 
-      outputs.push("import * as Chibivue from 'chibivue'")
+      outputs.push("import * as ChibiVue from 'chibivue'")
 
       const { descriptor } = parse(code, { filename: id })
 
