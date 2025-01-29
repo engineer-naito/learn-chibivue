@@ -1,7 +1,7 @@
 import { ReactiveEffect } from "../reactivity"
-import type { Component, ComponentInternalInstance, InternalRenderFunction } from "./component"
-import { createComponentInstance,} from "./component"
-import { initProps, updateProps } from "./componentProps"
+import type { Component, ComponentInternalInstance } from "./component"
+import { createComponentInstance, setupComponent } from "./component"
+import { updateProps } from "./componentProps"
 import { createVNode, normalizeVNode, Text } from "./vNode"
 import type { VNode } from "./vNode"
 
@@ -71,20 +71,9 @@ export function createRenderer(options: RendererOptions) {
   }
 
   const mountComponent = (initialVNode: VNode, container: RendererElement) => {
-    const instance: ComponentInternalInstance = (
-      initialVNode.component = createComponentInstance(initialVNode)
-    )
+    const instance: ComponentInternalInstance = (initialVNode.component = createComponentInstance(initialVNode))
 
-    const { props } = instance.vNode
-    initProps(instance, props)
-
-    const component =initialVNode.type as Component
-    if (component.setup) {
-      instance.render = component.setup(instance.props, {
-        emit: instance.emit,
-      }) as InternalRenderFunction
-    }
-
+    setupComponent(instance)
     setupRenderEffect(instance, initialVNode, container)
   }
 
@@ -94,10 +83,10 @@ export function createRenderer(options: RendererOptions) {
     container: RendererElement,
   ) => {
     const componentUpdateFn = () => {
-      const { render } = instance
+      const { render, setupState } = instance
       
       if (!instance.isMounted) {
-        const subTree = (instance.subTree = normalizeVNode(render()))
+        const subTree = (instance.subTree = normalizeVNode(render(setupState)))
         patch(null, subTree, container)
         initialVNode.el = subTree.el
         instance.isMounted = true
@@ -115,7 +104,7 @@ export function createRenderer(options: RendererOptions) {
         }
 
         const prevTree = instance.subTree
-        const nextTree = normalizeVNode(render())
+        const nextTree = normalizeVNode(render(setupState))
         instance.subTree = nextTree
 
         patch(prevTree, nextTree, hostParentNode(prevTree.el!)!)

@@ -1,8 +1,5 @@
 import type { CreateAppFunction } from "../runtime-core"
-import { 
-  createAppAPI,
-  createRenderer
-} from "../runtime-core"
+import { createAppAPI, createRenderer } from "../runtime-core"
 import { nodeOps } from "./nodeOps"
 import { patchProp } from "./patchProp"
 
@@ -14,9 +11,11 @@ export const createApp = ((...args) => {
   const { mount } = app
   app.mount = (selector: string) =>{
     const container = document.querySelector(selector)
-    if (!container) return 
+    if (!container) return
     mount(container)
   }
 
   return app
 }) as CreateAppFunction<Element>
+
+export * from "../runtime-core"
